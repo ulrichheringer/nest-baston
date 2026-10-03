@@ -1,0 +1,40 @@
+{
+  "name": "nest-baston",
+  "version": "1.0.0",
+  "description": "Distributed scheduled task locks for NestJS, inspired by ShedLock",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "tsc -p tsconfig.test.json && vitest run",
+    "build": "tsc",
+    "prepack": "npm run build"
+  },
+  "keywords": [
+    "nestjs",
+    "shedlock",
+    "distributed-lock",
+    "cron",
+    "redis"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@nestjs/schedule": "^12.0.2",
+    "@nestjs/testing": "^12.1.2",
+    "@types/node": "^26.6.3",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^12.1.2",
+    "@nestjs/core": "^12.1.2",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ]
+}

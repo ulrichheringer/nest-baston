@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": ".test-dist",
+    "declaration": false,
+    "module": "ESNext",
+    "moduleResolution": "bundler"
+  },
+  "exclude": []
+}
