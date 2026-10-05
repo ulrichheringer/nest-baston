@@ -9,7 +9,14 @@ export class MemoryLockProvider implements LockProvider {
     const token = Symbol(request.name);
     this.locks.set(request.name, { token, until: now + request.lockAtMostFor });
     let released = false;
-    return { release: async () => {
+    const renew = async (lockAtMostFor: number): Promise<boolean> => {
+      const lock = this.locks.get(request.name);
+      const current = this.now();
+      if (released || lock?.token !== token || lock.until <= current) return false;
+      lock.until = current + lockAtMostFor;
+      return true;
+    };
+    return { renew, release: async () => {
       if (released) return;
       released = true;
       if (this.locks.get(request.name)?.token !== token) return;

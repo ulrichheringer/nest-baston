@@ -17,6 +17,11 @@ local remaining = tonumber(redis.call('HGET', KEYS[1], 'leastUntil')) - now
 if remaining > 0 then redis.call('PEXPIRE', KEYS[1], remaining)
 else redis.call('DEL', KEYS[1]) end
 return 1`;
+const RENEW = `
+if redis.call('HGET', KEYS[1], 'token') ~= ARGV[1] then return 0 end
+if redis.call('PTTL', KEYS[1]) <= 0 then return 0 end
+redis.call('PEXPIRE', KEYS[1], ARGV[2])
+return 1`;
 export class RedisLockProvider implements LockProvider {
   constructor(private readonly client: RedisLockClient, private readonly prefix = 'baston:') {}
   async acquire(request: LockRequest): Promise<LockHandle | null> {
@@ -24,7 +29,10 @@ export class RedisLockProvider implements LockProvider {
     const key = this.prefix + request.name;
     if (Number(await this.client.eval(ACQUIRE, 1, key, token, request.lockAtMostFor, request.lockAtLeastFor)) !== 1) return null;
     let released = false;
-    return { release: async () => {
+    return { renew: async (lockAtMostFor: number) => {
+      if (released) return false;
+      return Number(await this.client.eval(RENEW, 1, key, token, lockAtMostFor)) === 1;
+    }, release: async () => {
       if (released) return;
       await this.client.eval(RELEASE, 1, key, token);
       released = true;
